@@ -75,7 +75,7 @@
 
 // SPDX-License-Identifier: MIT
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity 0.8.1;
 
 interface IERC20 {
     /**
@@ -709,11 +709,11 @@ contract Time is ERC20TokenImplementation {
      * @dev TimeZones are candidates possible to be yield farmed
      */
 
-    function _max_int() pure private returns (uint256) {
+    function _maxInt() private pure returns (uint256) {
         return 2 ** 256 - 1;
     }
 
-    function _seconds_in_day() pure private returns (uint256) {
+    function _secondsInDay() private pure returns (uint256) {
         return 86400;
     }
 
@@ -728,7 +728,7 @@ contract Time is ERC20TokenImplementation {
     string[] private _timeZoneKeys;
 
 
-    function _upsertTimeZone(string calldata id, string calldata description, address contractAddress) onlyOwner private returns (bool) {
+    function _upsertTimeZone(string calldata id, string calldata description, address contractAddress) private onlyOwner returns (bool) {
         TimeZone storage timeZoneToUpsert = _timeZoneMap[id];
         timeZoneToUpsert.id = id;
         timeZoneToUpsert.description = description;
@@ -738,22 +738,22 @@ contract Time is ERC20TokenImplementation {
             return true;
         } else {// new entry
             _timeZoneKeys.push(id);
-            uint keyListIndex = _timeZoneKeys.length - 1;
+            uint256 keyListIndex = _timeZoneKeys.length - 1;
             timeZoneToUpsert.index = keyListIndex + 1;
         }
         return true;
     }
 
-    function _removeTimeZone(string calldata id) onlyOwner private returns (bool) {
+    function _removeTimeZone(string calldata id) private onlyOwner returns (bool) {
         TimeZone storage timeZoneToRemove = _timeZoneMap[id];
         // entry not exist
-        require(timeZoneToRemove.index != 0);
+        require(timeZoneToRemove.index != 0, "Provided TimeZone does not exist!");
         // invalid index value
-        require(timeZoneToRemove.index <= _timeZoneKeys.length);
+        require(timeZoneToRemove.index <= _timeZoneKeys.length, "Provided TimeZone index is invalid!");
 
         // Move an last element of array into the vacated key slot.
-        uint keyListIndex = timeZoneToRemove.index - 1;
-        uint keyListLastIndex = _timeZoneKeys.length - 1;
+        uint256 keyListIndex = timeZoneToRemove.index - 1;
+        uint256 keyListLastIndex = _timeZoneKeys.length - 1;
         _timeZoneMap[_timeZoneKeys[keyListLastIndex]].index = keyListIndex + 1;
         _timeZoneKeys[keyListIndex] = _timeZoneKeys[keyListLastIndex];
         _timeZoneKeys.pop();
@@ -761,26 +761,16 @@ contract Time is ERC20TokenImplementation {
         return true;
     }
 
-    function _timeZonesSize() view private returns (uint) {
-        return uint(_timeZoneKeys.length);
+    function _timeZonesSize() private view returns (uint256) {
+        return uint256(_timeZoneKeys.length);
     }
 
-    function _timeZoneExists(string calldata id) view private returns (bool) {
+    function _timeZoneExists(string calldata id) private view returns (bool) {
         return _timeZoneMap[id].index > 0;
     }
 
-    function _timeZoneById(string calldata id) view private returns (TimeZone memory) {
+    function _timeZoneById(string calldata id) private view returns (TimeZone memory) {
         return _timeZoneMap[id];
-    }
-
-    function _timeZoneByIndex(uint index) view private returns (TimeZone memory) {
-        require(index >= 0);
-        require(index < _timeZoneKeys.length);
-        return _timeZoneMap[_timeZoneKeys[index]];
-    }
-
-    function _timeZonesKeys() view private returns (string[] memory) {
-        return _timeZoneKeys;
     }
 
     /**
@@ -804,7 +794,7 @@ contract Time is ERC20TokenImplementation {
             return true;
         } else {// new entry
             _votingProportionKeys.push(key);
-            uint keyListIndex = _votingProportionKeys.length - 1;
+            uint256 keyListIndex = _votingProportionKeys.length - 1;
             votingProportionToUpsert.index = keyListIndex + 1;
         }
         return true;
@@ -813,13 +803,13 @@ contract Time is ERC20TokenImplementation {
     function _removeVotingProportion(address key) private returns (bool) {
         VotingProportion storage votingProportionToRemove = _votingProportionMap[key];
         // entry not exist
-        require(votingProportionToRemove.index != 0);
+        require(votingProportionToRemove.index != 0, "Provided voting proportion does not exist!");
         // invalid index value
-        require(votingProportionToRemove.index <= _votingProportionKeys.length);
+        require(votingProportionToRemove.index <= _votingProportionKeys.length, "Provided voting proportion index is invalid!");
 
         // Move an last element of array into the vacated key slot.
-        uint keyListIndex = votingProportionToRemove.index - 1;
-        uint keyListLastIndex = _votingProportionKeys.length - 1;
+        uint256 keyListIndex = votingProportionToRemove.index - 1;
+        uint256 keyListLastIndex = _votingProportionKeys.length - 1;
         _votingProportionMap[_votingProportionKeys[keyListLastIndex]].index = keyListIndex + 1;
         _votingProportionKeys[keyListIndex] = _votingProportionKeys[keyListLastIndex];
         _votingProportionKeys.pop();
@@ -827,22 +817,12 @@ contract Time is ERC20TokenImplementation {
         return true;
     }
 
-    function _votingProportionSize() view private returns (uint) {
-        return uint(_votingProportionKeys.length);
+    function _votingProportionSize() private view returns (uint256) {
+        return uint256(_votingProportionKeys.length);
     }
 
-    function _votingProportionExists(address key) view private returns (bool) {
-        return _votingProportionMap[key].index > 0;
-    }
-
-    function _votingProportionByKey(address key) view private returns (VotingProportion memory) {
+    function _votingProportionByKey(address key) private view returns (VotingProportion memory) {
         return _votingProportionMap[key];
-    }
-
-    function _votingProportionByIndex(uint index) view private returns (VotingProportion memory) {
-        require(index >= 0);
-        require(index < _votingProportionKeys.length);
-        return _votingProportionMap[_votingProportionKeys[index]];
     }
 
 
@@ -890,7 +870,7 @@ contract Time is ERC20TokenImplementation {
         _timeZoneKeys = new string[](0);
         _votingProportionKeys = new address[](0);
         _maxTimeStamp = 0;
-        _minTimeStamp = _max_int();
+        _minTimeStamp = _maxInt();
         _expense = 0;
     }
 
@@ -898,6 +878,9 @@ contract Time is ERC20TokenImplementation {
      * @dev sets initials supply and the owner
      */
     function initialize(string memory name, string memory symbol, uint8 decimals, uint256 amount, bool mintable, address owner, address liquidityIn, address baseCurrencyIn) external initializer {
+        require(owner != address(0), "Address(owner) cannot be zero!");
+        require(liquidityIn != address(0), "Address(liquidityIn) cannot be zero!");
+        require(baseCurrencyIn != address(0), "Address(baseCurrencyIn) cannot be zero!");
         _owner = owner;
         _name = name;
         _symbol = symbol;
@@ -908,23 +891,23 @@ contract Time is ERC20TokenImplementation {
         _mint(owner, amount);
     }
 
-    function addOrUpdateTimeZone(string calldata id, string calldata description, address contractAddress) onlyOwner external returns (bool) {
+    function addOrUpdateTimeZone(string calldata id, string calldata description, address contractAddress) external onlyOwner returns (bool) {
         require(_upsertTimeZone(id, description, contractAddress), "Failed to upsert new time zone!");
         emit TimeZoneUpdated(id, description, contractAddress);
         return true;
     }
 
-    function removeTimeZone(string calldata id) onlyOwner external returns (bool) {
+    function removeTimeZone(string calldata id) external onlyOwner returns (bool) {
         require(_removeTimeZone(id), "Failed to remove time zone!");
         emit TimeZoneRemoved(id);
         return true;
     }
 
-    function timeZone(string calldata id) view external returns (TimeZone memory) {
+    function timeZone(string calldata id) external view returns (TimeZone memory) {
         return _timeZoneById(id);
     }
 
-    function timeZoneIds() view external returns (string[] memory) {
+    function timeZoneIds() external view returns (string[] memory) {
         return _timeZoneKeys;
     }
 
@@ -932,11 +915,12 @@ contract Time is ERC20TokenImplementation {
         require(zoneIds.length == proportions.length, "Voting zone length and proportion length does not match!");
         bool allKeyExists = true;
         uint256 proportionSum = 0;
-        for (uint256 i = 0; i < zoneIds.length; i++) {
+        uint256 zoneIdsLength = zoneIds.length;
+        for (uint256 i = 0; i < zoneIdsLength; i++) {
             allKeyExists = allKeyExists && _timeZoneExists(zoneIds[i]);
             proportionSum += proportions[i];
         }
-        require(allKeyExists, "Input contains wrong cadidate id(s)!");
+        require(allKeyExists, "Input contains wrong candidate id(s)!");
         require(proportionSum == 1 ether, "Voting proportion must add up to 1 ether");
         require(_upsertVotingProportion(msg.sender, zoneIds, proportions), "Failed to update voting proportions!");
         emit Voted(msg.sender, zoneIds, proportions);
@@ -949,27 +933,29 @@ contract Time is ERC20TokenImplementation {
         return true;
     }
 
-    function votingProportion(address account) view external returns (VotingProportion memory) {
+    function votingProportion(address account) external view returns (VotingProportion memory) {
         return _votingProportionByKey(account);
     }
 
-    function votingResult() view external returns (uint256[] memory) {
+    function votingResult() external view returns (uint256[] memory) {
         uint256[] memory votingResultToReturn = new uint256[](_timeZonesSize());
         for (uint256 i = 0; i < _votingProportionSize(); i++) {
             address account = _votingProportionKeys[i];
             uint256 accountBalance = _balances[account];
             string[] storage zoneIds = _votingProportionMap[account].zoneIds;
-            for (uint256 j = 0; j < zoneIds.length; j++) {
+            uint256 zoneIdsLength = zoneIds.length;
+            for (uint256 j = 0; j < zoneIdsLength; j++) {
                 uint256 zoneIndex = _timeZoneMap[zoneIds[j]].index - 1;
                 uint256 accountVotingProportion = _votingProportionMap[account].proportions[j];
-                votingResultToReturn[zoneIndex] += SafeMath.div(SafeMath.mul(accountBalance, accountVotingProportion), 1 ether);
+                votingResultToReturn[zoneIndex] += (accountBalance * accountVotingProportion) / 1 ether;
             }
         }
         return votingResultToReturn;
     }
 
-    function cleanVotingProportion() onlyOwner external returns (bool) {
-        for (uint256 i = 0; i < _votingProportionSize(); i++) {
+    function cleanVotingProportion() external onlyOwner returns (bool) {
+        uint256 votingProportionSize = _votingProportionSize();
+        for (uint256 i = 0; i < votingProportionSize; i++) {
             delete _votingProportionMap[_votingProportionKeys[i]];
         }
         delete _votingProportionKeys;
@@ -977,8 +963,9 @@ contract Time is ERC20TokenImplementation {
         return true;
     }
 
-    function cleanTimeZones() onlyOwner external returns (bool) {
-        for (uint256 i = 0; i < _timeZonesSize(); i++) {
+    function cleanTimeZones() external onlyOwner returns (bool) {
+        uint256 timeZonesSize = _timeZonesSize();
+        for (uint256 i = 0; i < timeZonesSize; i++) {
             delete _timeZoneMap[_timeZoneKeys[i]];
         }
         delete _timeZoneKeys;
@@ -989,7 +976,8 @@ contract Time is ERC20TokenImplementation {
     /**
      * @dev changes the liquidity account
      */
-    function setLiquidity(address liquidity) onlyOwner external returns (bool) {
+    function setLiquidity(address liquidity) external onlyOwner returns (bool) {
+        require(liquidity != address(0), "Address(liquidity) cannot be zero!");
         address previousLiquidity = _liquidity;
         _liquidity = liquidity;
         emit LiquidityChanged(previousLiquidity, _liquidity);
@@ -999,17 +987,18 @@ contract Time is ERC20TokenImplementation {
     /**
      * @dev main currency that time is backed - most likely one of the fiat base stablecoin
      */
-    function baseCurrency() view external returns (address) {
+    function baseCurrency() external view returns (address) {
         return _baseCurrency;
     }
 
     /**
      * @dev changes base currency contract, need to provide rate which is newBaseCurrency/currentBaseCurrency
      */
-    function setBaseCurrency(address newBaseCurrency, uint256 rate) onlyOwner external returns (bool) {
+    function setBaseCurrency(address newBaseCurrency, uint256 rate) external onlyOwner returns (bool) {
+        require(newBaseCurrency != address(0), "Address(newBaseCurrency) cannot be zero!");
         address previousBaseCurrency = _baseCurrency;
         _baseCurrency = newBaseCurrency;
-        for (uint256 timeStamp = _minTimeStamp; timeStamp <= _maxTimeStamp; timeStamp = timeStamp + _seconds_in_day()) {
+        for (uint256 timeStamp = _minTimeStamp; timeStamp <= _maxTimeStamp; timeStamp = timeStamp + _secondsInDay()) {
             if (_timeStampToPrice[timeStamp] != 0) {
                 _timeStampToPrice[timeStamp] = _applyRate(_timeStampToPrice[timeStamp], rate);
             }
@@ -1019,7 +1008,8 @@ contract Time is ERC20TokenImplementation {
     }
 
     function _applyRate(uint256 value, uint256 rate) internal pure returns (uint256) {
-        return SafeMath.div(SafeMath.mul(value, rate), 1 ether);
+        require(value * rate > 1 ether, "Provided rate is too small!");
+        return (value * rate) / 1 ether;
     }
 
     function _baseLiquidityAmount() internal view returns (uint256) {
@@ -1030,14 +1020,14 @@ contract Time is ERC20TokenImplementation {
      * @dev maximum amount time can be sold back at the moment
      * if this value is small, time service will refill liquidity with base currency
      */
-    function maxTimeSellAmount() view public returns (uint256) {
-        return SafeMath.div(SafeMath.mul(_baseLiquidityAmount(), 1 ether), currentPrice());
+    function maxTimeSellAmount() public view returns (uint256) {
+        return (_baseLiquidityAmount() * 1 ether) / currentPrice();
     }
 
     /**
      * @dev the actual live price - this price is used in maxTimeSellAmount and sellForBase
      */
-    function currentPrice() view public returns (uint256) {
+    function currentPrice() public view returns (uint256) {
         uint256 currentTimeStamp = block.timestamp;
         return _computePriceInfo(currentTimeStamp).computedPrice;
     }
@@ -1045,7 +1035,7 @@ contract Time is ERC20TokenImplementation {
     /**
      * @dev start price of the current timeframe
      */
-    function currentStartPrice() view public returns (uint256) {
+    function currentStartPrice() public view returns (uint256) {
         uint256 currentTimeStamp = block.timestamp;
         return _computePriceInfo(currentTimeStamp).priceFrom;
     }
@@ -1054,7 +1044,7 @@ contract Time is ERC20TokenImplementation {
      * @dev end price of the current timeframe
      * when buying time, it can be only bought with this price
      */
-    function currentEndPrice() view public returns (uint256) {
+    function currentEndPrice() public view returns (uint256) {
         uint256 currentTimeStamp = block.timestamp;
         return _computePriceInfo(currentTimeStamp).priceTo;
     }
@@ -1062,7 +1052,7 @@ contract Time is ERC20TokenImplementation {
     /**
      * @dev start timestamp of the current timeframe
      */
-    function currentStartTimeStamp() view public returns (uint256) {
+    function currentStartTimeStamp() public view returns (uint256) {
         uint256 currentTimeStamp = block.timestamp;
         return _computePriceInfo(currentTimeStamp).timeStampFrom;
     }
@@ -1070,7 +1060,7 @@ contract Time is ERC20TokenImplementation {
     /**
      * @dev end timestamp of the current timeframe
      */
-    function currentEndTimeStamp() view public returns (uint256) {
+    function currentEndTimeStamp() public view returns (uint256) {
         uint256 currentTimeStamp = block.timestamp;
         return _computePriceInfo(currentTimeStamp).timeStampTo;
     }
@@ -1078,7 +1068,7 @@ contract Time is ERC20TokenImplementation {
     /**
      * @dev full priceinfo object of the current timeframe
      */
-    function currentPriceInfo() view public returns (PriceInfo memory) {
+    function currentPriceInfo() public view returns (PriceInfo memory) {
         uint256 currentTimeStamp = block.timestamp;
         return _computePriceInfo(currentTimeStamp);
     }
@@ -1086,18 +1076,18 @@ contract Time is ERC20TokenImplementation {
     /**
      * @dev price of a given historical time
      */
-    function historicalPrice(uint256 timeStamp) view public returns (uint256) {
+    function historicalPrice(uint256 timeStamp) public view returns (uint256) {
         return _computePriceInfo(timeStamp).computedPrice;
     }
 
     /**
      * @dev full priceinfo object of a given historical time
      */
-    function historicalPriceInfo(uint256 timeStamp) view public returns (PriceInfo memory) {
+    function historicalPriceInfo(uint256 timeStamp) public view returns (PriceInfo memory) {
         return _computePriceInfo(timeStamp);
     }
 
-    function _computePriceInfo(uint256 timeStamp) view internal returns (PriceInfo memory) {
+    function _computePriceInfo(uint256 timeStamp) internal view returns (PriceInfo memory) {
         if (timeStamp <= _minTimeStamp) {
             uint256 minPrice = _timeStampToPrice[_minTimeStamp];
             return PriceInfo(_minTimeStamp, _minTimeStamp, minPrice, minPrice, minPrice);
@@ -1107,10 +1097,10 @@ contract Time is ERC20TokenImplementation {
             return PriceInfo(_maxTimeStamp, _maxTimeStamp, maxPrice, maxPrice, maxPrice);
         }
 
-        uint256 secondInDay = SafeMath.mod(timeStamp, _seconds_in_day());
+        uint256 secondInDay = timeStamp % _secondsInDay();
 
-        uint256 timeStampFrom = SafeMath.sub(timeStamp, secondInDay);
-        uint256 timeStampTo = SafeMath.add(timeStampFrom, _seconds_in_day());
+        uint256 timeStampFrom = timeStamp - secondInDay;
+        uint256 timeStampTo = timeStampFrom + _secondsInDay();
         uint256 priceFrom = _timeStampToPrice[timeStampFrom];
         uint256 priceTo = _timeStampToPrice[timeStampTo];
 
@@ -1124,7 +1114,7 @@ contract Time is ERC20TokenImplementation {
         uint256 priceRange = priceTo - priceFrom;
         uint256 timeRange = timeStampTo - timeStampFrom;
         uint256 timePassed = timeStamp - timeStampFrom;
-        uint256 price = SafeMath.add(SafeMath.div(SafeMath.mul(priceRange, timePassed), timeRange), priceFrom);
+        uint256 price = ((priceRange * timePassed) / timeRange) + priceFrom;
         return PriceInfo(timeStampFrom, timeStampTo, priceFrom, priceTo, price);
     }
 
@@ -1132,7 +1122,8 @@ contract Time is ERC20TokenImplementation {
      * @dev buy time coin with base currency end price
      */
     function buyForBase(uint256 timeAmount) external returns (bool) {
-        uint256 baseAmount = SafeMath.div(timeAmount * currentEndPrice(), 1 ether);
+        require(timeAmount * currentEndPrice() > 1 ether, "Provided timeAmount is too small!");
+        uint256 baseAmount = (timeAmount * currentEndPrice()) / 1 ether;
         IERC20(_baseCurrency).transferFrom(msg.sender, _liquidity, baseAmount);
         _mint(msg.sender, timeAmount);
         emit TimeBought(timeAmount, baseAmount, msg.sender);
@@ -1143,8 +1134,9 @@ contract Time is ERC20TokenImplementation {
      * @dev sell time coin with base currency current price
      */
     function sellForBase(uint256 timeAmount) external returns (bool) {
-        require(maxTimeSellAmount() > timeAmount, "Time amount to sell should be lower than maxTimeSellAmount()");
-        uint256 baseAmount = SafeMath.div(timeAmount * currentPrice(), 1 ether);
+        require(timeAmount * currentPrice() > 1 ether, "Provided timeAmount is too small!");
+        require(maxTimeSellAmount() > timeAmount, "Time amount to sell should be lower than maxTimeSellAmount()!");
+        uint256 baseAmount = (timeAmount * currentPrice()) / 1 ether;
         IERC20(_baseCurrency).transferFrom(_liquidity, msg.sender, baseAmount);
         _burn(msg.sender, timeAmount);
         emit TimeSold(timeAmount, baseAmount, msg.sender);
@@ -1154,7 +1146,7 @@ contract Time is ERC20TokenImplementation {
     /**
      * @dev reimburse expense
      */
-    function reimburse() onlyOwner external returns (bool) {
+    function reimburse() external onlyOwner returns (bool) {
         require(_baseLiquidityAmount() > _expense, "Not enough base liquidity amount!");
         IERC20(_baseCurrency).transferFrom(_liquidity, msg.sender, _expense);
         emit Reimbursed(_expense);
@@ -1162,26 +1154,26 @@ contract Time is ERC20TokenImplementation {
         return true;
     }
 
-    function expenseAmount() view external returns (uint256) {
+    function expenseAmount() external view returns (uint256) {
         return _expense;
     }
 
     /**
      * @dev run proof of lapse process using interest gained and amount of released coin (excluding owned by time itself)
      */
-    function proofOfLapse(uint256 capitalGain, uint256 releasedCoins, uint256 newTimeStamp, uint256 expense) onlyOwner external returns (bool) {
-        require(SafeMath.mod(newTimeStamp, _seconds_in_day()) == 0, "TimeStamp should be divisible by 86400!");
-        uint256 previousPrice = historicalPrice(SafeMath.sub(newTimeStamp, _seconds_in_day()));
-        uint256 newPrice = SafeMath.add(previousPrice, SafeMath.div(SafeMath.mul(SafeMath.sub(SafeMath.sub(capitalGain, expense), _expense), 1 ether), releasedCoins));
+    function proofOfLapse(uint256 capitalGain, uint256 releasedCoins, uint256 newTimeStamp, uint256 expense) external onlyOwner returns (bool) {
+        require(newTimeStamp % _secondsInDay() == 0, "TimeStamp should be divisible by 86400!");
+        uint256 previousPrice = historicalPrice(newTimeStamp - _secondsInDay());
+        uint256 newPrice = previousPrice + (((capitalGain - expense - _expense) * 1 ether) / releasedCoins);
         return proofOfLapse(newPrice, newTimeStamp, expense);
     }
 
     /**
      * @dev run proof of lapse process using new end price
      */
-    function proofOfLapse(uint256 newPrice, uint256 newTimeStamp, uint256 expense) onlyOwner public returns (bool) {
-        require(SafeMath.mod(newTimeStamp, _seconds_in_day()) == 0, "TimeStamp should be divisible by 86400!");
-        _expense = SafeMath.add(_expense, expense);
+    function proofOfLapse(uint256 newPrice, uint256 newTimeStamp, uint256 expense) public onlyOwner returns (bool) {
+        require(newTimeStamp % _secondsInDay() == 0, "TimeStamp should be divisible by 86400!");
+        _expense = _expense + expense;
         _timeStampToPrice[newTimeStamp] = newPrice;
         if (newTimeStamp < _minTimeStamp) {
             _minTimeStamp = newTimeStamp;
